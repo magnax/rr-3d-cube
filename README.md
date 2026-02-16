@@ -3,4 +3,4 @@
 Run:
 
 There is executable script which you can just run:
-`./run`
+`./run_dsl`
