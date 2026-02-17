@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 require 'raylib/dsl'
 
 BACKGROUND = 0x101010ff
@@ -7,15 +9,15 @@ Point = Struct.new('Point', :x, :y)
 Point3d = Struct.new('Point3d', :x, :y, :z)
 
 @vs = [
-  {x:  0.25, y:  0.25, z:  0.25},
-  {x:  0.25, y: -0.25, z:  0.25},
-  {x: -0.25, y: -0.25, z:  0.25},
-  {x: -0.25, y:  0.25, z:  0.25},
-  
-  {x:  0.25, y:  0.25, z: -0.25},
-  {x:  0.25, y: -0.25, z: -0.25},
-  {x: -0.25, y: -0.25, z: -0.25},
-  {x: -0.25, y:  0.25, z: -0.25},
+  { x:  0.25, y:  0.25, z:  0.25 },
+  { x:  0.25, y: -0.25, z:  0.25 },
+  { x: -0.25, y: -0.25, z:  0.25 },
+  { x: -0.25, y:  0.25, z: 0.25 },
+
+  { x:  0.25, y:  0.25, z: -0.25 },
+  { x:  0.25, y: -0.25, z: -0.25 },
+  { x: -0.25, y: -0.25, z: -0.25 },
+  { x: -0.25, y:  0.25, z: -0.25 }
 ]
 
 @fs = [
@@ -37,7 +39,7 @@ set_target_fps(@fps)
 def point(p)
   r = 6
   draw_circle p.x - r / 2, p.y - r / 2, r, get_color(FOREGROUND)
-rescue
+rescue StandardError
   nil
 end
 
@@ -53,7 +55,7 @@ def screen(p)
 end
 
 def project(p3d)
-  if p3d.z == 0
+  if p3d.z.zero?
     x = p3d.x
     y = p3d.y
   else
@@ -63,7 +65,7 @@ def project(p3d)
 
   Point.new(x, y)
 end
-  
+
 def screen_width
   @screen_width ||= get_screen_width
 end
@@ -96,16 +98,16 @@ def draw_all
   @angle += Math::PI * dt
 
   # uncomment below if you want to see the vertices
-  
+
   # @vs.each do |v|
   #   v3d = Point3d.new(v[:x], v[:y], v[:z])
   #   point(screen(project(translate_z(rotate_xz(v3d, @angle), @dz))))
   # end
   @fs.each do |f|
-    (0..(f.length-1)).each do |i|
+    (0..(f.length - 1)).each do |i|
       a = @vs[f[i]]
       a3d = Point3d.new(a[:x], a[:y], a[:z])
-      b = @vs[f[(i+1)%f.length]]
+      b = @vs[f[(i + 1) % f.length]]
       b3d = Point3d.new(b[:x], b[:y], b[:z])
       line(
         screen(project(translate_z(rotate_xz(a3d, @angle), @dz))),
@@ -114,20 +116,14 @@ def draw_all
     end
   end
 end
-    
+
 until window_should_close
 
-  if is_key_pressed(KEY_R)
-    @dz = 1
-  end
+  @dz = 1 if is_key_pressed(KEY_R)
 
-  if is_key_pressed(KEY_UP)
-    @dz -= 0.02
-  end
+  @dz -= 0.02 if is_key_pressed(KEY_UP)
 
-  if is_key_pressed(KEY_DOWN)
-    @dz += 0.02
-  end
+  @dz += 0.02 if is_key_pressed(KEY_DOWN)
 
   begin_drawing
   clear_background(get_color(BACKGROUND))
